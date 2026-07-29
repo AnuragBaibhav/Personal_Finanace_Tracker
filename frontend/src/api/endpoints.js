@@ -34,6 +34,7 @@ export const updateTransaction = (id, data) => API.put(`/api/transactions/transa
 export const deleteTransaction = (id) => API.delete(`/api/transactions/transactions/${id}/`);
 export const getTransactionSummary = () => API.get('/api/transactions/transactions/summary/');
 export const getTransactionsByCategory = () => API.get('/api/transactions/transactions/by_category/');
+export const exportTransactionsPdf = (params) => API.get('/api/transactions/transactions/export_pdf/', { params, responseType: 'blob' });
 
 // ── Budgets ──
 export const getBudgets = () => API.get('/api/budgets/budgets/');

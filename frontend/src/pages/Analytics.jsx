@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { getTransactions, getTransactionsByCategory, getTransactionSummary, getAccounts } from '../api/endpoints';
+import { getTransactions, getTransactionsByCategory, getTransactionSummary, getAccounts, getCategories } from '../api/endpoints';
 import { BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useCurrency } from '../context/CurrencyContext';
 
@@ -7,36 +7,62 @@ const COLORS = ['#6366f1', '#f43f5e', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'
 
 export default function Analytics() {
   const [transactions, setTransactions] = useState([]);
-  const [accounts, setAccounts] = useState([]);
-  const [selectedAccount, setSelectedAccount] = useState('all');
-  const [period, setPeriod] = useState('30'); // days
-  const [loading, setLoading] = useState(true);
-  const { fc, symbol, convert } = useCurrency();
+  const [categories, setCategories] = useState([]);
+  const [filters, setFilters] = useState({
+    account: 'all',
+    period: '30',
+    type: '',
+    category: '',
+    start_date: '',
+    end_date: '',
+    min_amount: '',
+    max_amount: '',
+    search: ''
+  });
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadMeta(); }, []);
+  useEffect(() => { loadTransactions(); }, [filters]);
 
-  const loadData = async () => {
+  const loadMeta = async () => {
+    try {
+      const [accRes, catRes] = await Promise.all([
+        getAccounts().catch(() => ({ data: [] })),
+        getCategories().catch(() => ({ data: [] })),
+      ]);
+      setAccounts(accRes.data?.results || accRes.data || []);
+      setCategories(catRes.data?.results || catRes.data || []);
+    } catch (err) { console.error(err); }
+  };
+
+  const loadTransactions = async () => {
     setLoading(true);
     try {
-      const [txRes, accRes] = await Promise.all([
-        getTransactions({ page_size: 500 }).catch(() => ({ data: [] })),
-        getAccounts().catch(() => ({ data: [] })),
-      ]);
+      const params = { page_size: 1000 };
+      if (filters.account && filters.account !== 'all') params.account = filters.account;
+      if (filters.type) params.type = filters.type;
+      if (filters.category) params.category = filters.category;
+      if (filters.min_amount) params.min_amount = filters.min_amount;
+      if (filters.max_amount) params.max_amount = filters.max_amount;
+      if (filters.search) params.search = filters.search;
+      
+      // Date logic
+      if (filters.start_date) {
+        params.start_date = filters.start_date;
+      } else if (filters.period && filters.period !== 'all') {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - parseInt(filters.period));
+        params.start_date = cutoff.toISOString().split('T')[0];
+      }
+      if (filters.end_date) params.end_date = filters.end_date;
+
+      const txRes = await getTransactions(params);
       setTransactions(txRes.data?.results || txRes.data || []);
-      setAccounts(accRes.data?.results || accRes.data || []);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
 
-  // Filter by account & period
-  const filtered = useMemo(() => {
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - parseInt(period));
-    return transactions.filter((tx) => {
-      if (selectedAccount !== 'all' && String(tx.account) !== selectedAccount) return false;
-      return new Date(tx.date) >= cutoff;
-    });
-  }, [transactions, selectedAccount, period]);
+  // The transactions are already filtered by the backend
+  const filtered = transactions;
 
   // Category breakdown
   const categoryData = useMemo(() => {
@@ -80,9 +106,16 @@ export default function Analytics() {
   const stats = useMemo(() => {
     const inc = filtered.filter(t => t.transaction_type === 'income').reduce((s, t) => s + parseFloat(t.amount), 0);
     const exp = filtered.filter(t => t.transaction_type === 'expense').reduce((s, t) => s + parseFloat(t.amount), 0);
-    const avgDaily = parseInt(period) > 0 ? exp / parseInt(period) : 0;
+    let days = 30;
+    if (filters.start_date && filters.end_date) {
+        const diffTime = Math.abs(new Date(filters.end_date) - new Date(filters.start_date));
+        days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+    } else if (filters.period && filters.period !== 'all') {
+        days = parseInt(filters.period);
+    }
+    const avgDaily = days > 0 ? exp / days : 0;
     return { income: inc, expense: exp, savings: inc - exp, avgDaily };
-  }, [filtered, period]);
+  }, [filtered, filters.period, filters.start_date, filters.end_date]);
 
   if (loading) return <div className="loading-spinner"><div className="spinner" /></div>;
 
@@ -90,17 +123,64 @@ export default function Analytics() {
     <div>
       <div className="page-header">
         <h1>Analytics</h1>
-        <div style={{ display: 'flex', gap: 12 }}>
-          <select value={selectedAccount} onChange={(e) => setSelectedAccount(e.target.value)} style={{ minWidth: 140 }}>
-            <option value="all">All Accounts</option>
-            {accounts.map(a => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
-          </select>
-          <select value={period} onChange={(e) => setPeriod(e.target.value)} style={{ minWidth: 120 }}>
-            <option value="7">Last 7 days</option>
-            <option value="30">Last 30 days</option>
-            <option value="90">Last 90 days</option>
-            <option value="365">Last year</option>
-          </select>
+      </div>
+
+      {/* Filters */}
+      <div className="card" style={{ marginBottom: 24 }}>
+        <div className="card-body" style={{ display: 'flex', gap: 16, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 120px' }}>
+            <label>Account</label>
+            <select value={filters.account} onChange={(e) => setFilters({ ...filters, account: e.target.value })}>
+              <option value="all">All Accounts</option>
+              {accounts.map(a => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
+            </select>
+          </div>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 120px' }}>
+            <label>Period</label>
+            <select value={filters.period} onChange={(e) => setFilters({ ...filters, period: e.target.value, start_date: '', end_date: '' })}>
+              <option value="all">Custom Dates</option>
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+              <option value="90">Last 90 days</option>
+              <option value="365">Last year</option>
+            </select>
+          </div>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 120px' }}>
+            <label>Type</label>
+            <select value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}>
+              <option value="">All Types</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 120px' }}>
+            <label>Category</label>
+            <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
+              <option value="">All Categories</option>
+              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 150px' }}>
+            <label>Company / Search</label>
+            <input type="text" placeholder="Search payee..." value={filters.search} onChange={(e) => setFilters({ ...filters, search: e.target.value })} />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 130px' }}>
+            <label>Start Date</label>
+            <input type="date" value={filters.start_date} onChange={(e) => setFilters({ ...filters, start_date: e.target.value, period: 'all' })} />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 130px' }}>
+            <label>End Date</label>
+            <input type="date" value={filters.end_date} onChange={(e) => setFilters({ ...filters, end_date: e.target.value, period: 'all' })} />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 80px' }}>
+            <label>Min Amt</label>
+            <input type="number" placeholder="Min" value={filters.min_amount} onChange={(e) => setFilters({ ...filters, min_amount: e.target.value })} />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 80px' }}>
+            <label>Max Amt</label>
+            <input type="number" placeholder="Max" value={filters.max_amount} onChange={(e) => setFilters({ ...filters, max_amount: e.target.value })} />
+          </div>
+          <button className="btn btn-secondary btn-sm" onClick={() => setFilters({ account: 'all', period: '30', type: '', category: '', start_date: '', end_date: '', min_amount: '', max_amount: '', search: '' })}>Clear</button>
         </div>
       </div>
 

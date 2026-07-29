@@ -74,8 +74,33 @@ Smart Finance Tracker is a comprehensive Django-based personal finance managemen
 - **Intelligent Agent**: Dynamic tool calling and decision making
 - **Conversation Management**: Multiple chat sessions per user
 - **Financial Context Awareness**: Understands user's financial situation
+- **Chatbot Capabilities**:
+  - Create and manage savings goals
+  - Create and modify budgets
+  - Analyze spending patterns
+  - Provide financial insights
+  - Answer financial questions
+  - Track account balances
+  - Generate spending reports
+  - Get personalized recommendations
+
+### 7. Machine Learning Features
+
+#### Automatic Transaction Categorization
+- **Algorithm**: TF-IDF vectorization + Multinomial Naive Bayes
+- **Learning**: Continuously learns from user-categorized transactions
+- **Confidence Scoring**: Only applies predictions with >60% confidence
+- **Accuracy Improvement**: Improves with more user data
+- **Real-Time Suggestions**: Suggests categories as users add transactions
+
+#### Predictive Budgeting
+- **Analysis Period**: Examines last 90 days of spending
+- **Pattern Recognition**: Identifies spending trends and habits
+
+## Tech Stack
+
 ### Backend & Framework
-- **Django**: 6.0.2 - Powerful Python web framework
+- **Django**: 4.2+ - Powerful Python web framework
 - **Django REST Framework**: 3.14+ - RESTful API toolkit
 - **Python**: 3.8+
 
@@ -106,27 +131,8 @@ Smart Finance Tracker is a comprehensive Django-based personal finance managemen
 - **Vite**: Frontend build tool
 - **Node.js**: JavaScript runtime
 - **Vue/React**: Recommended for UI (not included)
-- Create and manage savings goals
-- Create and modify budgets
-- Analyze spending patterns
-- Provide financial insights
-- Answer financial questions
-- Track account balances
-- Generate spending reports
-- Get personalized recommendations
 
-### 7. Machine Learning Features
-
-#### Automatic Transaction Categorization
-- **Algorithm**: TF-IDF vectorization + Multinomial Naive Bayes
-- **Learning**: Continuously learns from user-categorized transactions
-- **Confidence Scoring**: Only applies predictions with >60% confidence
-- **Accuracy Improvement**: Improves with more user data
-- **Real-Time Suggestions**: Suggests categories as users add transactions
-
-#### Predictive Budgeting
-- **Analysis Period**: Examines last 90 days of spending
-- **Pattern Recognition**: Identifies spending trends and habits
+## Prerequisites
 - **Python**: 3.8 or higher
 - **pip**: Python package manager
 - **virtualenv** or **conda**: Virtual environment manager (recommended)
@@ -134,10 +140,11 @@ Smart Finance Tracker is a comprehensive Django-based personal finance managemen
 - **Google Gemini API Key** (optional): For AI chatbot feature
 - **Ollama** (optional): For local LLM support
 
-### Step 1: Clone the Repository
+## Installation
 
+### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/Kr1shnenduManna/smart-finance-tracker.git
+git clone https://github.com/AnuragBaibhav/Personal_Finanace_Tracker.git
 cd smart-finance-tracker
 ```
 
@@ -162,13 +169,11 @@ conda activate finance_tracker
 ```
 
 ### Step 3: Install Dependencies
-
 ```bash
 pip install -r requirements.txt
 ```
 
 ### Step 4: Configure Environment Variables
-
 Create a `.env` file in the project root or set environment variables:
 
 ```bash
@@ -191,99 +196,40 @@ export GEMINI_ENABLED='true'
 export GEMINI_MODEL='gemini-1.5-flash'
 
 # Ollama Configuration (optional)
-export OLLAMA_ENABLED='false'Choose one based on your use case:
-
-- **Session Authentication**: For browser-based frontend applications
-- **Token Authentication**: For mobile apps and programmatic access
-
-### Core Endpoints
-
-#### Accounts API
-```
-GET    /api/accounts/users/              - List users
-GET    /api/accounts/users/me/           - Get current user profile
-GET    /api/accounts/accounts/           - List user's accounts
-POST   /api/accounts/accounts/           - Create new account
-GET    /api/accounts/accounts/{id}/      - Get account details
-PUT    /api/accounts/accounts/{id}/      - Update account
-DELETE /api/accounts/accounts/{id}/      - Delete account
+export OLLAMA_ENABLED='false'
+export OLLAMA_BASE_URL='http://localhost:11434'
+export OLLAMA_MODEL='mistral'
 ```
 
-#### Transactions API
-```
-GET    /api/transactions/categories/           - List all categories
-GET    /api/transactions/categories/income/    - List income categories
-GET    /api/transactions/categories/expense/   - List expense categories
-POST   /api/transactions/categories/           - Create category
-
-GET    /api/transactions/transactions/         - List transactions
-  └─ Query: type, start_date, end_date, category, account
-POST   /api/transactions/transactions/         - Create transaction
-GET    /api/transactions/transactions/summary/ - Get summary
-GET    /api/transactions/transactions/by_category/ - Group by category
+### Step 5: Run Database Migrations
+```bash
+python manage.py makemigrations
+python manage.py migrate
 ```
 
-#### Budgets API
-```
-GET    /api/budgets/budgets/           - List budgets
-POST   /api/budgets/budgets/           - Create budget
-GET    /api/budgets/budgets/{id}/      - Get budget details
-PUT    /api/budgets/budgets/{id}/      - Update budget
-DELETE /api/budgets/budgets/{id}/      - Delete budget
-GET    /api/budgets/budgets/active/    - List active budgets
-GET    /api/budgets/budgets/alerts/    - Get budget alerts
+### Step 6: Populate Default Categories
+```bash
+python manage.py populate_categories
 ```
 
-#### Bills API
-```
-GET    /api/bills/bills/               - List all bills
-POST   /api/bills/bills/               - Create bill
-GET    /api/bills/bills/{id}/          - Get bill details
-PUT    /api/bills/bills/{id}/          - Update bill
-DELETE /api/bills/bills/{id}/          - Delete bill
-GET    /api/bills/bills/upcoming/      - Get upcoming bills
-GET    /api/bills/bills/{id}/pay/      - Mark bill as paid
+### Step 7: Create a Superuser
+```bash
+python manage.py createsuperuser
 ```
 
-#### Goals API
+### Step 8: Run the Development Server
+```bash
+python manage.py runserver
 ```
-GET    /api/goals/goals/               - List savings goals
-POST   /api/goals/goals/               - Create goal
-GET    /api/goals/goals/{id}/          - Get goal details
-PUT    /api/goals/goals/{id}/          - Update goal
-DELETE /api/goals/goals/{id      # User and account management
-│   ├── models.py               # User and Account models
-│   ├── serializers.py          # API serializers
-│   ├── views.py                # API viewsets
-│   ├── urls.py                 # URL routing
-│   ├── admin.py                # Admin configuration
-│   ├── currency_utils.py       # Currency conversion utilities
-│   └── migrations/             # Database migrations
-│
-├── transactions/                # Transaction management
-│   ├── models.py               # Category and Transaction models
-│   ├── serializers.py          # API serializers
-│   ├── views.py                # API viewsets
-│   ├── urls.py                 # URL routing
-│   ├── signals.py              # Django signals
-│   ├── admin.py                # Admin configuration
-│   ├── management/             # Custom management commands
-│   │   └── commands/
-│   │       └── populate_categories.py  # Initialize categories
-│   └── migrations/             # Database migrations
-│
-├── budgets/                     # Budget management
-│   ├── models.py               # Budget model
-│   ├── serializers.py          # API serializers
-│   ├── views.py                # API viewsets
-│   ├── urls.py                 # URL routing
-│  AI & Machine Learning
+Access the application:
+- Admin panel: http://127.0.0.1:8000/admin/
+- API root: http://127.0.0.1:8000/api/
 
-### Chatbot Integration
+## Chatbot Integration
 
 The Smart Finance Tracker includes an advanced AI chatbot agent that helps users manage their finances conversationally.
 
-#### Supported LLM Providers
+### Supported LLM Providers
 
 **1. Google Gemini (Recommended)**
 - Cloud-based with latest models
@@ -299,12 +245,14 @@ The Smart Finance Tracker includes an advanced AI chatbot agent that helps users
 - Lower latency for repeated queries
 - Models: Mistral, Llama 2, Neural Chat, etc.
 - Set up with: `OLLAMA_ENABLED=true`
+- Make sure to install and pull the model:
+  ```bash
+  ollama pull mistral  # or llama2, neural-chat, etc.
+  ```
 
-#### Chatbot Capabilities
-Usage Examples
+## Usage Examples
 
 ### 1. Creating an Account via API
-
 ```python
 import requests
 
@@ -324,7 +272,6 @@ response = requests.post(
 ```
 
 ### 2. Chatbot Conversation
-
 ```python
 from chatbot.agents.ai_agent import AIFinancialAgent
 
@@ -341,7 +288,6 @@ print(result['response'])
 ```
 
 ### 3. Using ML Categorization
-
 ```python
 from ml_features.ml_utils import get_categorizer
 
@@ -355,207 +301,7 @@ suggestions = categorizer.predict(
 print(suggestions)  # Returns: [{'category': 'dining', 'confidence': 0.85}]
 ```
 
-### 4. Budget Management
-
-```python
-from budgets.models import Budget
-from transactions.models import Category
-
-category = Category.objects.get(name='Groceries')
-budget = Budget.objects.create(
-    user_id=1,
-    category=category,
-    limit_amount=600,
-    period='monthly',
-    alert_threshold=80
-)
-
-# Check current status
-spent = budget.get_current_spending()
-remaining = budget.limit_amount - spent
-print(f"Spent: ${spent}, Remaining: ${remaining}")
-```
-
-## Testing
-
-### Run All Tests
-```bash
-python manage.py test
-```
-
-### Run Specific App Tests
-```bash
-python manage.py test transactions
-python manage.py test chatbot
-python manage.py test ml_features
-```
-
-### Test Chatbot Flow
-```bash
-python test_chatbot_flow.py
-```
-
-### Test System Integration
-```bash
-python test_system.py
-```
-
-## Development Guide
-
-### Adding a New Category
-
-```python
-from transactions.models import Category
-
-Category.objects.create(
-    name='Travel',
-    category_type='expense',
-    icon='✈️',
-    color='#3498db'
-)
-```
-
-### Creating Custom Management Commands
-
-```bash
-# Create command structure
-python manage.py startapp mycommand
-mkdir mycommand/management/management/commands
-touch mycommand/management/commands/mycustom.py
-```
-
-### Debugging
-
-Enable debug logging:
-```python
-import logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-```
-
-## Performance Optimization
-
-### Database Optimization
-- Use `select_related()` and `prefetch_related()` for queries
-- Add database indexes for frequently queried fields
-- Use pagination for large result sets
-
-### ML Model Optimization
-- Cache predictions for identical descriptions
-- Batch process transactions
-- Archive old training data periodically
-
-### API Optimization
-- Enable caching with Redis
-- Use pagination (default: 20 items per page)
-- Compress API responses
-
-## Troubleshooting
-
-### Common Issues
-
-**Issue**: Gemini API not working
-- **Solution**: Check API key in environment variables
-- **Debug**: Run `python manage.py shell` and test connection
-
-**Issue**: Chatbot not responding
-- **Solution**: Check if LLM is available (`python test_chatbot_flow.py`)
-- **Fallback**: System will automatically use intelligent fallback
-
-**Issue**: ML model not categorizing correctly
-- **Solution**: Train with more examples
-- **Command**: `python manage.py train_models --category=categorization`
-
-**Issue**: Database errors
-- **Solution**: Run migrations
-- **Command**: `python manage.py makemigrations && python manage.py migrate`
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Code Style
-- Follow PEP 8 standards
-- Use type hints where possible
-- Write docstrings for all functions
-- Add tests for new features
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Citation
-
-If you use Smart Finance Tracker in your research, please cite:
-```bibtex
-@repo{smart_finance_tracker,
-  author = {Kr1shnendu Manna},
-  title = {Smart Finance Tracker - AI-Powered Personal Finance Management},
-  year = {2024},
-  url = {https://github.com/Kr1shnenduManna/smart-finance-tracker}
-}
-```
-
-## Support & Community
-
-- **Issues**: [GitHub Issues](https://github.com/Kr1shnenduManna/smart-finance-tracker/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Kr1shnenduManna/smart-finance-tracker/discussions)
-- **Documentation**: See `/md/` folder for detailed guides
-
-## Roadmap
-
-### v1.5 (In Progress)
-- ✅ Bills management system
-- ✅ Savings goals tracking
-- ✅ Advanced AI chatbot agent
-- 🔄 Mobile app (React Native)
-- 🔄 Advanced analytics dashboard
-
-### v2.0 (Planned)
-- [ ] Banking API integration (Plaid, Open Banking)
-- [ ] Automatic transaction import
-- [ ] Investment portfolio tracking
-- [ ] Tax report generation
-- [ ] Multi-language support
-- [ ] Mobile-responsive web UI
-- [ ] Real-time spending notifications
-- [ ] Expense splitting for shared expenses
-- [ ] Credit score tracking
-- [ ] Financial goal recommendations
-- [ ] Cryptocurrency tracking
-- [ ] Multi-user household budgets
-
-### v2.5 (Future)
-- [ ] Advanced forecasting models
-- [ ] Voice commands support
-- [ ] Blockchain transaction tracking
-- [ ] Financial advisor recommendations
-- [ ] Data export (CSV, PDF, Excel)
-- [ ] Custom report builder
-
-## Acknowledgments
-
-- Django and Django REST Framework communities
-- Google Generative AI for Gemini API
-- Ollama for local LLM capabilities
-- scikit-learn for ML algorithms
-- All contributors and users
-
-## Contact
-
-**Author**: Krishnendu Manna  
-**Email**: krishnendumanna29@gmail.com
-**GitHub**: [@Kr1shnenduManna](https://github.com/Kr1shnenduManna)
-
----
-
-**Made with ❤️ for financial freedom**
+### 4. Budget Management Prediction
 ```python
 from ml_features.ml_utils import BudgetPredictor
 
@@ -564,96 +310,58 @@ recommendations = predictor.suggest_budgets(user_id=1, period='monthly')
 # Returns: {'groceries': 600, 'dining': 300, 'utilities': 200, ...}
 ```
 
-### Model Training & Retraining
+## API Documentation
 
-#### Automatic Training
-- Models train automatically as new data is added
-- Happens in the background via signals
-- No manual intervention required
+### Authentication
+All API endpoints require authentication. Use session authentication for browser-based access or token authentication for programmatic access.
 
-#### Manual Retraining
-```bash
-python manage.py train_models --category=categorization
-python manage.py train_models --category=budget_prediction
-```
+### Endpoints
 
-#### Model Evaluation
-```python
-from ml_features.ml_utils import get_categorizer
+#### Accounts
+- `GET /api/accounts/users/` - List all users
+- `GET /api/accounts/users/me/` - Get current user
+- `GET /api/accounts/accounts/` - List user's accounts
+- `POST /api/accounts/accounts/` - Create new account
+- `GET /api/accounts/accounts/{id}/` - Get account details
+- `PUT /api/accounts/accounts/{id}/` - Update account
+- `DELETE /api/accounts/accounts/{id}/` - Delete account
 
-categorizer = get_categorizer()
-accuracy = categorizer.get_accuracy()
-confidence_scores = categorizer.get_confidence_metrics()
-```al_agent.py # Financial chatbot agent
-│   ├── llm/                    # LLM integrations
-│   │   ├── gemini_client.py   # Google Gemini API client
-│   │   ├── ollama_client.py   # Ollama local LLM client
-│   │   └── __init__.py
-│   ├── tools/                  # Chatbot tools
-│   │   └── function_tools.py  # Tool definitions for chatbot
-│   ├── models.py              # Chat session, message models
-│   ├── serializers.py         # API serializers
-│   ├── views.py               # API viewsets
-│   ├── urls.py                # URL routing
-│   ├── admin.py               # Admin configuration
-│   └── migrations/            # Database migrations
-│
-├── ml_features/                 # Machine learning features
-│   ├── models.py               # ML model metadata
-│   ├── ml_utils.py             # ML algorithms and utilities
-│   ├── ml_utils.ipynb          # Jupyter notebook for ML exploration
-│   ├── serializers.py          # API serializers
-│   ├── views.py                # API viewsets
-│   ├── urls.py                 # URL routing
-│   ├── admin.py                # Admin configuration
-│   ├── management/             # Custom management commands
-│   ├── migrations/             # Database migrations
-│   └── __pycache__/            # Python cache
-│
-├── finance_tracker/             # Project configuration
-│   ├── settings.py             # Main Django settings
-│   ├── settings_production.py.example # Production config template
-│   ├── urls.py                 # Main URL routing
-│   ├── wsgi.py                 # WSGI application
-│   ├── asgi.py                 # ASGI application
-│   └── views.py                # Project-level views
-│
-├── frontend/                     # Frontend application
-│   ├── src/                    # Vue/React source files
-│   ├── public/                 # Static assets
-│   ├── package.json            # NPM dependencies
-│   ├── vite.config.js          # Vite configuration
-│   └── index.html              # HTML entry point
-│
-├── ml_models/                    # Saved ML models
-│   └── exchange_rates.json     # Exchange rate data
-│
-├── media/                        # User uploaded content
-│   └── profile_pics/           # User profile pictures
-│
-├── md/                           # Documentation
-│   ├── CHATBOT_AGENT_DESIGN.md
-│   ├── CHATBOT_IMPLEMENTATION_GUIDE.md
-│   ├── CHATBOT_README.md
-│   ├── CHATBOT_SETUP_COMPLETE.md
-│   ├── FREE_LLM_SETUP_GUIDE.md
-│   ├── BILLS_AND_GOALS_GUIDE.md
-│   ├── OLLAMA_INTEGRATION_COMPLETE.md
-│   ├── OLLAMA_QUICK_START.md
-│   ├── OLLAMA_SETUP_GUIDE.md
-│   ├── architecture_design.md
-│   ├── IMPLEMENTATION_SUMMARY.md
-│   └── PROJECT_REPORT.md
-│
-├── manage.py                    # Django management script
-├── requirements.txt             # Python dependencies
-├── db.sqlite3                   # Development database
-├── README.md                    # This file
-├── LICENSE                      # MIT License
-├── setup_chatbot.py            # Chatbot setup script
-├── test_chatbot_flow.py        # Chatbot testing script
-├── test_system.py              # System testing script
-└── api_examples.py             # API usage exampl
+#### Transactions
+- `GET /api/transactions/categories/` - List all categories
+- `GET /api/transactions/categories/income/` - List income categories
+- `GET /api/transactions/categories/expense/` - List expense categories
+- `POST /api/transactions/categories/` - Create category
+- `GET /api/transactions/transactions/` - List transactions (Query params: `type`, `start_date`, `end_date`, `category`, `account`)
+- `POST /api/transactions/transactions/` - Create transaction
+- `GET /api/transactions/transactions/summary/` - Get transaction summary
+- `GET /api/transactions/transactions/by_category/` - Group by category
+
+#### Budgets
+- `GET /api/budgets/budgets/` - List budgets
+- `POST /api/budgets/budgets/` - Create budget
+- `GET /api/budgets/budgets/{id}/` - Get budget details
+- `PUT /api/budgets/budgets/{id}/` - Update budget
+- `DELETE /api/budgets/budgets/{id}/` - Delete budget
+- `GET /api/budgets/budgets/active/` - List active budgets
+- `GET /api/budgets/budgets/alerts/` - Get budget alerts
+
+#### Bills
+- `GET /api/bills/bills/` - List all bills
+- `POST /api/bills/bills/` - Create bill
+- `GET /api/bills/bills/{id}/` - Get bill details
+- `PUT /api/bills/bills/{id}/` - Update bill
+- `DELETE /api/bills/bills/{id}/` - Delete bill
+- `GET /api/bills/bills/upcoming/` - Get upcoming bills
+- `GET /api/bills/bills/{id}/pay/` - Mark bill as paid
+
+#### Goals
+- `GET /api/goals/goals/` - List savings goals
+- `POST /api/goals/goals/` - Create goal
+- `GET /api/goals/goals/{id}/` - Get goal details
+- `PUT /api/goals/goals/{id}/` - Update goal
+- `DELETE /api/goals/goals/{id}/` - Delete goal
+
+### Curl API Examples
 
 #### 1. Create a Transaction
 ```bash
@@ -726,208 +434,116 @@ curl -X POST http://127.0.0.1:8000/api/bills/bills/ \
     "due_date": 15,
     "category": 8
   }'
-   ollama pull mistral  # or llama2, neural-chat, etc.
-   ```
-
-4. **Configure Django**:
-   ```bash
-   export OLLAMA_ENABLED='true'
-   export OLLAMA_BASE_URL='http://localhost:11434'
-   export OLLAMA_MODEL='mistral'
-   ```
-
-5. **Restart Django Server**:
-   ```bash
-   python manage.py runserver
-   ```
-
-## Production Deployment
-
-### Important Security Settings
-
-Before deploying to production:
-
-1. **Generate a strong SECRET_KEY**:
-   ```python
-   from django.core.management.utils import get_random_secret_key
-   print(get_random_secret_key())
-   ```
-
-2. **Set environment variables**:
-   ```bash
-   export DEBUG=False
-   export ALLOWED_HOSTS='yourdomain.com,www.yourdomain.com'
-   export DJANGO_SECRET_KEY='your-generated-secret-key'
-   ```
-
-3. **Use PostgreSQL** instead of SQLite
-4. **Configure HTTPS** and SSL/TLS
-5. **Set up proper logging** and monitoring
-6. **Use production WSGI server** (Gunicorn, uWSGI)
-
-See `settings_production.py.example` for production configuration template.
-   
-   **Note**: For production, always set a strong SECRET_KEY and set DEBUG=False
-
-5. **Run database migrations**
-   ```bash
-   python manage.py migrate
-   ```
-
-6. **Populate default categories**
-   ```bash
-   python manage.py populate_categories
-   ```
-
-7. **Create a superuser**
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-8. **Run the development server**
-   ```bash
-   python manage.py runserver
-   ```
-
-9. **Access the application**
-   - Admin panel: http://127.0.0.1:8000/admin/
-   - API root: http://127.0.0.1:8000/api/
-
-## API Documentation
-
-### Authentication
-
-All API endpoints require authentication. Use session authentication for browser-based access or token authentication for programmatic access.
-
-### Endpoints
-
-#### Accounts
-- `GET /api/accounts/users/` - List all users
-- `GET /api/accounts/users/me/` - Get current user
-- `GET /api/accounts/accounts/` - List user's accounts
-- `POST /api/accounts/accounts/` - Create new account
-- `GET /api/accounts/accounts/{id}/` - Get account details
-- `PUT /api/accounts/accounts/{id}/` - Update account
-- `DELETE /api/accounts/accounts/{id}/` - Delete account
-
-#### Transactions
-- `GET /api/transactions/categories/` - List all categories
-- `GET /api/transactions/categories/income/` - List income categories
-- `GET /api/transactions/categories/expense/` - List expense categories
-- `POST /api/transactions/categories/` - Create category
-- `GET /api/transactions/transactions/` - List transactions
-  - Query params: `type`, `start_date`, `end_date`, `category`
-- `POST /api/transactions/transactions/` - Create transaction
-- `GET /api/transactions/transactions/summary/` - Get transaction summary
-- `GET /api/transactions/transactions/by_category/` - Group by category
-
-#### Budgets
-- `GET /api/budgets/budgets/` - List budgets
-- `POST /api/budgets/budgets/` - Create budget
-- `GET /api/budgets/budgets/{id}/` - Get budget details
-- `PUT /api/budgets/budgets/{id}/` - Update budget
-- `DELETE /api/budgets/budgets/{id}/` - Delete budget
-- `GET /api/budgets/budgets/active/` - List active budgets
-- `GET /api/budgets/budgets/alerts/` - Get budget alerts
-
-### API Examples
-
-#### Create a Transaction
-```bash
-curl -X POST http://127.0.0.1:8000/api/transactions/transactions/ \
-  -H "Content-Type: application/json" \
-  -u username:password \
-  -d '{
-    "account": 1,
-    "category": 5,
-    "transaction_type": "expense",
-    "amount": "50.00",
-    "description": "Grocery shopping at Whole Foods",
-    "date": "2024-02-15"
-  }'
 ```
 
-#### Get Transaction Summary
-```bash
-curl http://127.0.0.1:8000/api/transactions/transactions/summary/ \
-  -u username:password
-```
 
 ## Project Structure
 
-```
+```text
 smart-finance-tracker/
 ├── accounts/              # User and account management
-│   ├── models.py         # User and Account models
-│   ├── serializers.py    # API serializers
-│   ├── views.py          # API viewsets
-│   └── admin.py          # Admin configuration
+│   ├── models.py          # User and Account models
+│   ├── serializers.py     # API serializers
+│   ├── views.py           # API viewsets
+│   ├── urls.py            # URL routing
+│   ├── admin.py           # Admin configuration
+│   └── currency_utils.py  # Currency conversion utilities
 ├── transactions/          # Transaction management
-│   ├── models.py         # Category and Transaction models
-│   ├── serializers.py    # API serializers
-│   ├── views.py          # API viewsets
-│   └── management/       # Custom management commands
+│   ├── models.py          # Category and Transaction models
+│   ├── serializers.py     # API serializers
+│   ├── views.py           # API viewsets
+│   ├── urls.py            # URL routing
+│   ├── signals.py         # Django signals
+│   └── management/        # Custom management commands
 ├── budgets/               # Budget management
-│   ├── models.py         # Budget model
-│   ├── serializers.py    # API serializers
-│   └── views.py          # API viewsets
+│   ├── models.py          # Budget model
+│   ├── serializers.py     # API serializers
+│   ├── views.py           # API viewsets
+│   └── urls.py            # URL routing
+├── bills/                 # Bills management
+├── goals/                 # Savings goals management
+├── chatbot/               # AI chatbot agent
+│   ├── agents/            # Agent logic
+│   │   └── ai_agent.py    # Financial chatbot agent
+│   ├── llm/               # LLM integrations
+│   │   ├── gemini_client.py # Google Gemini API client
+│   │   └── ollama_client.py # Ollama local LLM client
+│   └── tools/             # Chatbot tools
 ├── ml_features/           # Machine learning features
-│   ├── models.py         # ML model metadata
-│   ├── ml_utils.py       # ML utilities and algorithms
-│   └── admin.py          # Admin configuration
+│   ├── models.py          # ML model metadata
+│   ├── ml_utils.py        # ML utilities and algorithms
+│   └── views.py           # API viewsets
 ├── finance_tracker/       # Project configuration
-│   ├── settings.py       # Django settings
-│   ├── urls.py           # URL routing
-│   └── wsgi.py           # WSGI configuration
+│   ├── settings.py        # Django settings
+│   ├── urls.py            # URL routing
+│   └── wsgi.py            # WSGI configuration
+├── frontend/              # Frontend application (React/Vue/Vite)
+├── md/                    # Documentation
 ├── manage.py              # Django management script
 └── requirements.txt       # Python dependencies
 ```
 
-## Machine Learning Details
+## Development Guide
 
-### Transaction Categorization
-
-The system uses a machine learning pipeline consisting of:
-- **TF-IDF Vectorizer**: Converts transaction descriptions to numerical features
-- **Multinomial Naive Bayes**: Classifies transactions into categories
-- **Confidence Scoring**: Only applies predictions with >60% confidence
-
-Training occurs automatically as users categorize transactions manually. The model improves over time with more data.
-
-### Budget Prediction
-
-The budget predictor analyzes:
-- Historical spending patterns (last 90 days)
-- Category-specific trends
-- Spending frequency
-- Average transaction amounts
-
-It suggests optimal budget amounts based on:
-- Period type (daily, weekly, monthly, yearly)
-- Historical averages
-- Spending variance
-
-## Development
-
-### Running Tests
-```bash
-python manage.py test
-```
-
-### Creating Custom Categories
+### Adding a New Category
 ```python
 from transactions.models import Category
 
 Category.objects.create(
-    name='Custom Category',
+    name='Travel',
     category_type='expense',
-    icon='custom-icon',
-    color='#FF5733'
+    icon='✈️',
+    color='#3498db'
 )
+```
+
+### Creating Custom Management Commands
+```bash
+# Create command structure
+python manage.py startapp mycommand
+mkdir -p mycommand/management/commands
+touch mycommand/management/commands/mycustom.py
+```
+
+### Debugging
+Enable debug logging:
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+```
+
+### Testing
+
+#### Run All Tests
+```bash
+python manage.py test
+```
+
+#### Run Specific App Tests
+```bash
+python manage.py test transactions
+python manage.py test chatbot
+python manage.py test ml_features
+```
+
+#### Test Chatbot Flow
+```bash
+python test_chatbot_flow.py
+```
+
+#### Test System Integration
+```bash
+python test_system.py
 ```
 
 ### Training ML Models
 The ML models train automatically as data is added. To manually retrain:
+```bash
+python manage.py train_models --category=categorization
+python manage.py train_models --category=budget_prediction
+```
+Or via code:
 ```python
 from ml_features.ml_utils import get_categorizer
 from transactions.models import Transaction
@@ -940,27 +556,146 @@ categorizer.train(descriptions, categories)
 categorizer.save_model('ml_models/categorizer.pkl')
 ```
 
-## Contributing
+## Performance Optimization
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Database Optimization
+- Use `select_related()` and `prefetch_related()` for queries
+- Add database indexes for frequently queried fields
+- Use pagination for large result sets
 
-## License
+### ML Model Optimization
+- Cache predictions for identical descriptions
+- Batch process transactions
+- Archive old training data periodically
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+### API Optimization
+- Enable caching with Redis
+- Use pagination (default: 20 items per page)
+- Compress API responses
 
-## Support
+## Troubleshooting
 
-For issues, questions, or contributions, please open an issue on GitHub.
+### Common Issues
+
+**Issue**: Gemini API not working
+- **Solution**: Check API key in environment variables
+- **Debug**: Run `python manage.py shell` and test connection
+
+**Issue**: Chatbot not responding
+- **Solution**: Check if LLM is available (`python test_chatbot_flow.py`)
+- **Fallback**: System will automatically use intelligent fallback
+
+**Issue**: ML model not categorizing correctly
+- **Solution**: Train with more examples
+- **Command**: `python manage.py train_models --category=categorization`
+
+**Issue**: Database errors
+- **Solution**: Run migrations
+- **Command**: `python manage.py makemigrations && python manage.py migrate`
+
+## Production Deployment
+
+### Important Security Settings
+Before deploying to production:
+
+1. **Generate a strong SECRET_KEY**:
+   ```python
+   from django.core.management.utils import get_random_secret_key
+   print(get_random_secret_key())
+   ```
+2. **Set environment variables**:
+   ```bash
+   export DEBUG=False
+   export ALLOWED_HOSTS='yourdomain.com,www.yourdomain.com'
+   export DJANGO_SECRET_KEY='your-generated-secret-key'
+   ```
+3. **Use PostgreSQL** instead of SQLite
+4. **Configure HTTPS** and SSL/TLS
+5. **Set up proper logging** and monitoring
+6. **Use production WSGI server** (Gunicorn, uWSGI)
+
+See `settings_production.py.example` for production configuration template.
+**Note**: For production, always set a strong SECRET_KEY and set DEBUG=False.
 
 ## Roadmap
 
-- [ ] Add data export functionality (CSV, PDF)
-- [ ] Implement recurring transaction automation
-- [ ] Add bill reminders and notifications
-- [ ] Create mobile-responsive dashboard
-- [ ] Implement investment portfolio tracking
-- [ ] Add multi-language support
-- [ ] Integrate with banking APIs for automatic transaction import
-- [ ] Add advanced data visualizations and reports
-- [ ] Implement goal-setting and tracking features
-- [ ] Add expense splitting for shared expenses
+### v1.5 (In Progress)
+- ✅ Bills management system
+- ✅ Savings goals tracking
+- ✅ Advanced AI chatbot agent
+- 🔄 Mobile app (React Native)
+- 🔄 Advanced analytics dashboard
+
+### v2.0 (Planned)
+- [ ] Banking API integration (Plaid, Open Banking)
+- [ ] Automatic transaction import
+- [ ] Investment portfolio tracking
+- [ ] Tax report generation
+- [ ] Multi-language support
+- [ ] Mobile-responsive web UI
+- [ ] Real-time spending notifications
+- [ ] Expense splitting for shared expenses
+- [ ] Credit score tracking
+- [ ] Financial goal recommendations
+- [ ] Cryptocurrency tracking
+- [ ] Multi-user household budgets
+
+### v2.5 (Future)
+- [ ] Advanced forecasting models
+- [ ] Voice commands support
+- [ ] Blockchain transaction tracking
+- [ ] Financial advisor recommendations
+- [ ] Data export (CSV, PDF, Excel)
+- [ ] Custom report builder
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Code Style
+- Follow PEP 8 standards
+- Use type hints where possible
+- Write docstrings for all functions
+- Add tests for new features
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Citation
+
+If you use Smart Finance Tracker in your research, please cite:
+```bibtex
+@repo{smart_finance_tracker,
+  author = {Anurag Baibhav},
+  title = {Smart Finance Tracker - AI-Powered Personal Finance Management},
+  year = {2024},
+  url = {https://github.com/AnuragBaibhav/Personal_Finanace_Tracker}
+}
+```
+
+## Support & Community
+
+- **Issues**: [GitHub Issues](https://github.com/AnuragBaibhav/Personal_Finanace_Tracker/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/AnuragBaibhav/Personal_Finanace_Tracker/discussions)
+- **Documentation**: See `/md/` folder for detailed guides
+
+## Acknowledgments
+- Django and Django REST Framework communities
+- Google Generative AI for Gemini API
+- Ollama for local LLM capabilities
+- scikit-learn for ML algorithms
+- All contributors and users
+
+## Contact
+**Author**: Anurag Baibhav  
+**Email**: anuragbaibhavrab@gmail.com  
+**GitHub**: [@AnuragBaibhav](https://github.com/AnuragBaibhav)
+
+---
+**Made with ❤️ for financial freedom**

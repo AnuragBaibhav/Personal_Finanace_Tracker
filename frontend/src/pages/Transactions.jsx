@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { getTransactions, getCategories, getAccounts, createTransaction, deleteTransaction, getCurrencies, getExchangeRate } from '../api/endpoints';
-import { Plus, Trash2, ArrowRightLeft } from 'lucide-react';
+import { getTransactions, getCategories, getAccounts, createTransaction, deleteTransaction, getCurrencies, getExchangeRate, exportTransactionsPdf } from '../api/endpoints';
+import { Plus, Trash2, ArrowRightLeft, Download } from 'lucide-react';
 import Modal from '../components/Modal';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
@@ -15,7 +15,7 @@ export default function Transactions() {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [filters, setFilters] = useState({ type: '', category: '', start_date: '', end_date: '' });
+  const [filters, setFilters] = useState({ type: '', category: '', start_date: '', end_date: '', min_amount: '', max_amount: '' });
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { addToast } = useToast();
@@ -64,6 +64,8 @@ export default function Transactions() {
       if (filters.category) params.category = filters.category;
       if (filters.start_date) params.start_date = filters.start_date;
       if (filters.end_date) params.end_date = filters.end_date;
+      if (filters.min_amount) params.min_amount = filters.min_amount;
+      if (filters.max_amount) params.max_amount = filters.max_amount;
       const res = await getTransactions(params);
       const data = res.data;
       setTransactions(data.results || data || []);
@@ -137,6 +139,31 @@ export default function Transactions() {
     catch { addToast('Failed to delete', 'error'); }
   };
 
+  const handleExportPdf = async () => {
+    try {
+      const params = {};
+      if (filters.type) params.type = filters.type;
+      if (filters.category) params.category = filters.category;
+      if (filters.start_date) params.start_date = filters.start_date;
+      if (filters.end_date) params.end_date = filters.end_date;
+      if (filters.min_amount) params.min_amount = filters.min_amount;
+      if (filters.max_amount) params.max_amount = filters.max_amount;
+      
+      addToast('Generating PDF...');
+      const res = await exportTransactionsPdf(params);
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'transaction_report.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      addToast('PDF downloaded successfully!');
+    } catch (err) {
+      addToast('Failed to download PDF', 'error');
+    }
+  };
+
   // Allow user to type custom category or pick from list
   const filteredCategories = categories.filter((c) => c.category_type === form.transaction_type);
 
@@ -144,7 +171,10 @@ export default function Transactions() {
     <div>
       <div className="page-header">
         <h1>Transactions</h1>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}><Plus size={16} /> Add Transaction</button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn btn-secondary" onClick={handleExportPdf}><Download size={16} /> Export PDF</button>
+          <button className="btn btn-primary" onClick={() => setShowModal(true)}><Plus size={16} /> Add Transaction</button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -173,7 +203,15 @@ export default function Transactions() {
             <label>End Date</label>
             <input type="date" value={filters.end_date} onChange={(e) => { setFilters({ ...filters, end_date: e.target.value }); setPage(1); }} />
           </div>
-          <button className="btn btn-secondary btn-sm" onClick={() => { setFilters({ type: '', category: '', start_date: '', end_date: '' }); setPage(1); }}>Clear</button>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 100px' }}>
+            <label>Min Amount</label>
+            <input type="number" value={filters.min_amount} placeholder="Min" onChange={(e) => { setFilters({ ...filters, min_amount: e.target.value }); setPage(1); }} />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0, flex: '1 1 100px' }}>
+            <label>Max Amount</label>
+            <input type="number" value={filters.max_amount} placeholder="Max" onChange={(e) => { setFilters({ ...filters, max_amount: e.target.value }); setPage(1); }} />
+          </div>
+          <button className="btn btn-secondary btn-sm" onClick={() => { setFilters({ type: '', category: '', start_date: '', end_date: '', min_amount: '', max_amount: '' }); setPage(1); }}>Clear</button>
         </div>
       </div>
 
