@@ -178,7 +178,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
         import io
         from datetime import datetime
 
-        queryset = self.get_queryset()
+        queryset = self.filter_queryset(self.get_queryset())
         
         # Calculate summary before formatting
         income = queryset.filter(transaction_type="income").aggregate(total=Sum("amount"))["total"] or 0
@@ -242,6 +242,6 @@ class TransactionViewSet(viewsets.ModelViewSet):
         doc.build(elements)
 
         buffer.seek(0)
-        response = HttpResponse(buffer, content_type='application/pdf')
+        response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="transaction_report.pdf"'
         return response

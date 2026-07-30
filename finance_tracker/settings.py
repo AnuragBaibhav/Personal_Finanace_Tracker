@@ -21,6 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 import os
+import pymysql
+pymysql.install_as_MySQLdb()
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",

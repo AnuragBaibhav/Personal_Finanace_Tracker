@@ -5,6 +5,7 @@ import { CurrencyProvider } from './context/CurrencyContext';
 import ChatbotButton from './components/ChatbotButton';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import Accounts from './pages/Accounts';
 import Transactions from './pages/Transactions';
 import Budgets from './pages/Budgets';
 import Analytics from './pages/Analytics';
@@ -66,6 +67,7 @@ function App() {
             {/* Protected routes */}
             <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
+              <Route path="accounts" element={<Accounts />} />
               <Route path="transactions" element={<Transactions />} />
               <Route path="budgets" element={<Budgets />} />
               <Route path="bills" element={<Bills />} />
